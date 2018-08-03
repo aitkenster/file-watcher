@@ -1,0 +1,35 @@
+System requirements:
+
+Docker
+
+Assumptions:
+
+- Nested folders do not need to be read, only files
+
+TODO for watcher nodes:
+- endpoint to retrieve list of files
+
+TODO for file-aggregator:
+- tests and finish adding individual items to list
+
+TODO overall:
+- Documentation
+- Configuration for multiple nodes
+
+Docmentation
+- To run an individual node
+- To run a group of nodes
+
+Considerations:
+- What if more than one watcher watches the same folder?
+- What if list of files is giant? Paginate API
+
+Files API
+PATCH /files
+[{
+    "op": "add",
+    "path": "/files"
+    "value": {
+        "name": "filename.txt",
+    }
+}]
