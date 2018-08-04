@@ -6,9 +6,10 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"path/filepath"
 
-	fsnotify "gopkg.in/fsnotify.v1"
+	"github.com/fsnotify/fsnotify"
 
 	"github.com/aitkenster/file-watcher/watcher-node/aggregator"
 	"github.com/aitkenster/file-watcher/watcher-node/filestore"
@@ -25,7 +26,7 @@ func main() {
 	var directory = flag.String("dir", mountedDir, "the path of the directory to watch")
 	flag.Parse()
 
-	aggregatorClient := aggregator.New("http://localhost:9090", &http.Client{})
+	aggregatorClient := aggregator.New(&http.Client{})
 
 	store, err := initializeStoreForDirectory(*directory)
 	if err != nil {
@@ -55,7 +56,7 @@ func main() {
 		log.Println("[ERROR]", err)
 	}
 
-	port := "6060"
+	port := os.Getenv("PORT")
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", port), nil))
 }
 

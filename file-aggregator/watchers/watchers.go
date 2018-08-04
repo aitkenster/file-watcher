@@ -5,6 +5,8 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
+	"strings"
 
 	"github.com/aitkenster/file-watcher/file-aggregator/lib"
 )
@@ -13,20 +15,34 @@ type directoryResponse struct {
 	Files []lib.FileMetadata `json:"files"`
 }
 
-func GetDirectoryFiles() ([]lib.FileMetadata, error) {
-	resp, err := http.Get("http://localhost:6060/directory")
-	if err != nil {
-		log.Println("[ERROR]", err)
-	}
+type WatcherConfig struct {
+	baseUrls []string
+}
 
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
+func NewConfig() *WatcherConfig {
+	return &WatcherConfig{
+		baseUrls: strings.Split(os.Getenv("WATCHER_ADDRESSES"), ","),
 	}
+}
 
-	var unmarshalledBody directoryResponse
-	err = json.Unmarshal(body, &unmarshalledBody)
-	if err != nil {
+func (wc *WatcherConfig) GetDirectoryFiles() ([]lib.FileMetadata, error) {
+	fl := []lib.FileMetadata{}
+	for _, url := range wc.baseUrls {
+		resp, err := http.Get(url + "/directory")
+		if err != nil {
+			log.Println("[ERROR]", err)
+		}
+
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return nil, err
+		}
+
+		var unmarshalledBody directoryResponse
+		err = json.Unmarshal(body, &unmarshalledBody)
+		if err != nil {
+		}
+		fl = append(fl, unmarshalledBody.Files...)
 	}
-	return unmarshalledBody.Files, nil
+	return fl, nil
 }

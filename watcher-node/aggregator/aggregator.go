@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"net/http"
+	"os"
 
 	"github.com/aitkenster/file-watcher/watcher-node/lib"
 )
@@ -19,9 +20,9 @@ type patchOperation struct {
 	Value lib.FileMetadata `json:"value"`
 }
 
-func New(baseUrl string, client *http.Client) *Aggregator {
+func New(client *http.Client) *Aggregator {
 	return &Aggregator{
-		baseUrl: baseUrl,
+		baseUrl: os.Getenv("FILE_AGGREGATOR_ADDRESS"),
 		client:  client,
 	}
 }

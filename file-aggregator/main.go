@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/aitkenster/file-watcher/file-aggregator/files"
 	server "github.com/aitkenster/file-watcher/file-aggregator/server"
@@ -19,7 +20,8 @@ func main() {
 		}
 	})
 
-	directoryFiles, err := watchers.GetDirectoryFiles()
+	watcherConfig := watchers.NewConfig()
+	directoryFiles, err := watcherConfig.GetDirectoryFiles()
 	if err != nil {
 		log.Println("[ERROR]: ", err)
 		// probably need a kill or retry here
@@ -27,6 +29,6 @@ func main() {
 
 	store = files.New(directoryFiles)
 
-	port := "9090"
+	port := os.Getenv("PORT")
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", port), nil))
 }
