@@ -2,33 +2,38 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"io/ioutil"
 	"log"
-	"sync"
+	"net/http"
+	"path/filepath"
 
-	"github.com/fsnotify/fsnotify"
+	fsnotify "gopkg.in/fsnotify.v1"
+
+	"github.com/aitkenster/file-watcher/watcher-node/aggregator"
+	"github.com/aitkenster/file-watcher/watcher-node/filestore"
+	"github.com/aitkenster/file-watcher/watcher-node/server"
 )
 
-const mountedDir = "/host/watched-folder"
+const (
+	mountedDir = "/host/watched-folder"
+	add        = "add"
+	remove     = "remove"
+)
 
 func main() {
 	var directory = flag.String("dir", mountedDir, "the path of the directory to watch")
 	flag.Parse()
 
-	log.Println("[INFO] Retrieving file list")
-	files, err := ioutil.ReadDir(*directory)
+	aggregatorClient := aggregator.New("http://localhost:9090", &http.Client{})
+
+	store, err := initializeStoreForDirectory(*directory)
 	if err != nil {
 		log.Fatal("[ERROR]", err)
 	}
 
-	var mutex sync.Mutex
-	filestore := filestore{}
+	http.HandleFunc("/directory", server.DirectoryHandler(store))
 
-	filestore.addFiles(files)
-
-	log.Println("[INFO]", filestore)
-
-	log.Println("[INFO] Starting up file watcher")
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
 		log.Println("[ERROR]", err)
@@ -41,11 +46,7 @@ func main() {
 		for {
 			select {
 			case event := <-watcher.Events:
-				mutex.Lock()
-				filestore.processEvent(event)
-				mutex.Unlock()
-				log.Println("[INFO]", filestore)
-
+				handleEvent(event, store, aggregatorClient)
 			case err := <-watcher.Errors:
 				log.Println("[ERROR]", err)
 			}
@@ -56,5 +57,49 @@ func main() {
 		log.Println("[ERROR]", err)
 	}
 
+	port := "6060"
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", port), nil))
+
 	<-done
+}
+
+func initializeStoreForDirectory(directory string) (*filestore.Store, error) {
+	store := filestore.New()
+
+	files, err := ioutil.ReadDir(directory)
+	if err != nil {
+		return nil, err
+	}
+
+	store.AddFiles(files)
+	return store, nil
+}
+
+func handleEvent(
+	event fsnotify.Event,
+	store *filestore.Store,
+	aggregator *aggregator.Aggregator,
+) {
+	op := getOp(event)
+	if op == "" {
+		return
+	}
+	filename := filepath.Base(event.Name)
+
+	store.Update(op, filename)
+
+	err := aggregator.NotifyUpdate(op, filename)
+	if err != nil {
+		log.Println("[ERROR]: ", err)
+	}
+}
+
+func getOp(event fsnotify.Event) string {
+	switch event.Op {
+	case fsnotify.Create:
+		return add
+	case fsnotify.Remove, fsnotify.Rename:
+		return remove
+	}
+	return ""
 }

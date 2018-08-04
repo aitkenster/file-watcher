@@ -10,7 +10,8 @@ TODO for watcher nodes:
 - endpoint to retrieve list of files
 
 TODO for file-aggregator:
-- tests and finish adding individual items to list
+- endpoint for client to retrieve sorted list
+- handle patch requests concurrently
 
 TODO overall:
 - Documentation
@@ -25,6 +26,24 @@ Considerations:
 - What if list of files is giant? Paginate API
 
 Files API
+GET /directory
+{
+    files: [{
+        "name": "filename.txt"
+    },{
+        "name": "newfile.txt"
+    }]
+}
+
+GET /files
+{
+    items: [{
+        "name": "filename.txt"
+    },{
+        "name": "newfile.txt"
+    }]
+}
+
 PATCH /files
 [{
     "op": "add",
