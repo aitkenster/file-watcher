@@ -40,8 +40,6 @@ func main() {
 	}
 	defer watcher.Close()
 
-	done := make(chan bool)
-
 	go func() {
 		for {
 			select {
@@ -59,8 +57,6 @@ func main() {
 
 	port := "6060"
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", port), nil))
-
-	<-done
 }
 
 func initializeStoreForDirectory(directory string) (*filestore.Store, error) {

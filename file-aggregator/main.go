@@ -1,62 +1,32 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
+
+	"github.com/aitkenster/file-watcher/file-aggregator/files"
+	server "github.com/aitkenster/file-watcher/file-aggregator/server"
+	"github.com/aitkenster/file-watcher/file-aggregator/watchers"
 )
 
 func main() {
-	// get all files from each node and store in list
-	files := newFiles()
+	var store *files.Filestore
 
-	// set up listeners to each node
 	http.HandleFunc("/files", func(w http.ResponseWriter, r *http.Request) {
-		filesRequestHandler(w, r, files)
+		if store != nil {
+			server.FilesRequestHandler(w, r, store)
+		}
 	})
 
-	//port := os.Getenv("PORT")
+	directoryFiles, err := watchers.GetDirectoryFiles()
+	if err != nil {
+		log.Println("[ERROR]: ", err)
+		// probably need a kill or retry here
+	}
+
+	store = files.New(directoryFiles)
+
 	port := "9090"
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", port), nil))
-
-	// insert new file into list
-}
-
-type filesPatchRequest []patchOperation
-
-// Op should be enum
-type patchOperation struct {
-	Op    string       `json:"op"`
-	Path  string       `json:"path"`
-	Value fileMetadata `json:"value"`
-}
-
-type fileMetadata struct {
-	Name string `json:"name"`
-}
-
-func filesRequestHandler(w http.ResponseWriter, r *http.Request, files *files) {
-	if !(r.Method == http.MethodPatch) {
-		log.Println("[ERROR] invalid request method :", r.Method)
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		return
-	}
-
-	body, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		log.Println("[ERROR]", err)
-	}
-
-	var req filesPatchRequest
-	json.Unmarshal(body, &req)
-
-	for _, op := range req {
-		files.modifyList(op)
-	}
-
-	files.printList()
-
-	log.Println(req)
 }

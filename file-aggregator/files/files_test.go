@@ -1,24 +1,26 @@
-package main
+package files
 
 import (
 	"container/list"
 	"reflect"
 	"testing"
+
+	"github.com/aitkenster/file-watcher/file-aggregator/lib"
 )
 
 func TestModifyFilesList(t *testing.T) {
 	tests := []struct {
 		scenario          string
-		operation         patchOperation
+		operation         lib.PatchOperation
 		initialFileNames  []string
 		expectedFileNames []string
 	}{
 		{
 			scenario: "add file",
-			operation: patchOperation{
+			operation: lib.PatchOperation{
 				Op:   "add",
 				Path: "/files",
-				Value: fileMetadata{
+				Value: lib.FileMetadata{
 					Name: "newfile.txt",
 				},
 			},
@@ -27,10 +29,10 @@ func TestModifyFilesList(t *testing.T) {
 		},
 		{
 			scenario: "remove file",
-			operation: patchOperation{
+			operation: lib.PatchOperation{
 				Op:   "remove",
 				Path: "/files",
-				Value: fileMetadata{
+				Value: lib.FileMetadata{
 					Name: "removeme.txt",
 				},
 			},
@@ -43,10 +45,10 @@ func TestModifyFilesList(t *testing.T) {
 		},
 		{
 			scenario: "unknown op",
-			operation: patchOperation{
+			operation: lib.PatchOperation{
 				Op:   "modify",
 				Path: "/files",
-				Value: fileMetadata{
+				Value: lib.FileMetadata{
 					Name: "name.txt",
 				},
 			},
@@ -55,10 +57,10 @@ func TestModifyFilesList(t *testing.T) {
 		},
 		{
 			scenario: "remove unknown file",
-			operation: patchOperation{
+			operation: lib.PatchOperation{
 				Op:   "remove",
 				Path: "/files",
-				Value: fileMetadata{
+				Value: lib.FileMetadata{
 					Name: "name.txt",
 				},
 			},
@@ -67,10 +69,10 @@ func TestModifyFilesList(t *testing.T) {
 		},
 		{
 			scenario: "remove unknown file",
-			operation: patchOperation{
+			operation: lib.PatchOperation{
 				Op:   "remove",
 				Path: "/files",
-				Value: fileMetadata{
+				Value: lib.FileMetadata{
 					Name: "name.txt",
 				},
 			},
@@ -79,10 +81,10 @@ func TestModifyFilesList(t *testing.T) {
 		},
 		{
 			scenario: "add file to empty list",
-			operation: patchOperation{
+			operation: lib.PatchOperation{
 				Op:   "add",
 				Path: "/files",
-				Value: fileMetadata{
+				Value: lib.FileMetadata{
 					Name: "name.txt",
 				},
 			},
@@ -92,10 +94,10 @@ func TestModifyFilesList(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		actualFiles := files{
+		actualFiles := Filestore{
 			list: createOrderedFileList(test.initialFileNames),
 		}
-		actualFiles.modifyList(test.operation)
+		actualFiles.ModifyList(test.operation)
 		actualFileNames := getOrderedFileNames(actualFiles)
 		if !reflect.DeepEqual(actualFileNames, test.expectedFileNames) {
 			t.Errorf(
@@ -116,7 +118,7 @@ func createOrderedFileList(items []string) *list.List {
 	return list
 }
 
-func getOrderedFileNames(files files) []string {
+func getOrderedFileNames(files Filestore) []string {
 	names := []string{}
 	for e := files.list.Front(); e != nil; e = e.Next() {
 		names = append(names, e.Value.(string))
