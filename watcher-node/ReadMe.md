@@ -7,6 +7,7 @@ Store an updated list of the changes which happen in a specfied folder, and upda
 `GET http://localhost:4000/directory`
 
 Response:
+```
 {
     "files" [{
         "name: "file.txt"
@@ -14,6 +15,7 @@ Response:
         "name": "anotherfile.txt"
     }]
 }
+```
 
 # To run:
 
