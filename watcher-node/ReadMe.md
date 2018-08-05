@@ -21,6 +21,6 @@ Response:
 
 system requirements: Golang
 
-`make build` then run `./watcher-node -dir=./yourwatched/directory`
+`make build` then run `./watcher-node -dir=${./yourwatched/directory}`
 
 To test run `make test`
