@@ -1,4 +1,4 @@
-#File aggregator
+# File aggregator
 
 Stores and returns a list of file names.
 
