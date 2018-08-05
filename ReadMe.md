@@ -34,7 +34,7 @@ System requirements: Docker
 To add more folder watchers, increase the number of `watcher` services in the `docker-compose.yml` file. Remember to update the port and `WATCHER_ADDRESSES` in the `file_aggregator` service.
 
 ## Tests
-Run `make tests` to run all tests
+Run `make test` to run all tests
 
 ## Improvements
 - When a watcher node restarts after failure, update all the files watched by that node in the aggregated list
