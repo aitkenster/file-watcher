@@ -23,15 +23,17 @@ Response body:
 }
 ```
 
-## Configuration
+## Running it
 
 System requirements: Docker
 
 1. `git clone git@github.com:aitkenster/file-watcher.git`
-2. Change the `.env` file to point to the folders you want to watch. Paths can be relative (from the file-watcher folder), or absolute
-2. Run `make run`
+2. Run `make run` ( this will create a `file-watcher/example` directory with watched sub directories.
 
-To add more folder watchers, increase the number of `watcher` services in the `docker-compose.yml` file. Remember to update the port and `WATCHER_ADDRESSES` in the `file_aggregator` service.
+To use your own folders:
+Change the `.env` file to point to the folders you want to watch. Paths can be relative (from the file-watcher folder), or absolute.
+
+To add more folder watchers than the default 3, increase the number of `watcher` services in the `docker-compose.yml` file. Remember to update the port and `WATCHER_ADDRESSES` in the `file_aggregator` service.
 
 ## Tests
 Run `make test` to run all tests
