@@ -1,6 +1,7 @@
 # File watcher
 
 Watch and retrieve an aggregated, alphabetized list of files from the folders you specify
+![](https://www.dropbox.com/s/9aiyriduyve9l07/Screenshot%202018-08-05%2013.41.11.png?)
 
 ## Endpoint
 
