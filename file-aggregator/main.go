@@ -12,6 +12,7 @@ import (
 )
 
 func main() {
+	log.Println("[INFO] file aggregator started")
 	var store *files.Filestore
 
 	http.HandleFunc("/files", func(w http.ResponseWriter, r *http.Request) {
@@ -24,11 +25,13 @@ func main() {
 	directoryFiles, err := watcherConfig.GetDirectoryFiles()
 	if err != nil {
 		log.Println("[ERROR]: ", err)
-		// probably need a kill or retry here
 	}
 
 	store = files.New(directoryFiles)
 
 	port := os.Getenv("PORT")
+	if port == "" {
+		port = "9999"
+	}
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", port), nil))
 }

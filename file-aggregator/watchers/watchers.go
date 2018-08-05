@@ -20,8 +20,13 @@ type WatcherConfig struct {
 }
 
 func NewConfig() *WatcherConfig {
+	baseUrls := strings.Split(os.Getenv("WATCHER_ADDRESSES"), ",")
+	if baseUrls[0] == "" {
+		log.Fatal("[ERROR] no WATCHER_ADDRESSES env var set")
+	}
+
 	return &WatcherConfig{
-		baseUrls: strings.Split(os.Getenv("WATCHER_ADDRESSES"), ","),
+		baseUrls: baseUrls,
 	}
 }
 

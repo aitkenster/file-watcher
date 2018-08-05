@@ -1,11 +1,11 @@
-version: '2'
+version: '3.4'
 
 services:
   file_aggregator:
     build: ./file-aggregator
     restart: on-failure
     ports:
-      - 9999
+        - 9999:9999
     depends_on:
       - watcher1
       - watcher2
@@ -16,9 +16,9 @@ services:
 
   watcher1:
     build: ./watcher-node
-    #restart: on-failure
+    restart: on-failure
     volumes:
-      - /Users/nicolaaitken/dev/golang/src/github.com/aitkenster/hungry-girl:/host/watched-folder
+        - ${FOLDER_1}:/host/watched-folder
     ports:
       - 1001
     environment:
@@ -27,9 +27,9 @@ services:
 
   watcher2:
     build: ./watcher-node
-    #restart: on-failure
+    restart: on-failure
     volumes:
-      - /Users/nicolaaitken/dev/golang/src/github.com/aitkenster/amazon-mock:/host/watched-folder
+        - ${FOLDER_2}:/host/watched-folder
     ports:
       - 1002
     environment:
@@ -38,9 +38,9 @@ services:
 
   watcher3:
     build: ./watcher-node
-    #restart: on-failure
+    restart: on-failure
     volumes:
-      - /Users/nicolaaitken/dev/golang/src/github.com/aitkenster/temp:/host/watched-folder
+        - ${FOLDER_3}:/host/watched-folder
     ports:
       - 1003
     environment:

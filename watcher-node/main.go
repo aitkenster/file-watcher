@@ -23,6 +23,7 @@ const (
 )
 
 func main() {
+	log.Println("[INFO] starting watcher node")
 	var directory = flag.String("dir", mountedDir, "the path of the directory to watch")
 	flag.Parse()
 
@@ -55,8 +56,12 @@ func main() {
 	if err := watcher.Add(*directory); err != nil {
 		log.Println("[ERROR]", err)
 	}
+	log.Println("[INFO] Now watching ", *directory)
 
 	port := os.Getenv("PORT")
+	if port == "" {
+		port = "4000"
+	}
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", port), nil))
 }
 

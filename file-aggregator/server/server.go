@@ -41,8 +41,6 @@ func handlePatchFiles(w http.ResponseWriter, r *http.Request, files *files.Files
 	for _, op := range req {
 		files.ModifyList(op)
 	}
-
-	log.Println(req)
 }
 
 func handleGetFiles(w http.ResponseWriter, r *http.Request, files *files.Filestore) {

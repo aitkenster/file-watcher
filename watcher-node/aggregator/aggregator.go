@@ -3,6 +3,7 @@ package aggregator
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"net/http"
 	"os"
 
@@ -28,6 +29,9 @@ func New(client *http.Client) *Aggregator {
 }
 
 func (ag *Aggregator) NotifyUpdate(op string, filename string) error {
+	if ag.baseUrl == "" {
+		return errors.New("No FILE_AGGREGATOR_ADDRESS set")
+	}
 	body := []patchOperation{
 		patchOperation{
 			Op:   op,
