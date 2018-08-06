@@ -1,0 +1,25 @@
+version: '3.4'
+services:
+  file_aggregator:
+    build: ./file-aggregator
+    restart: on-failure
+    ports:
+        - 7807:7807
+    depends_on: {{range $i,$v := .}}
+      - watcher{{add 1 $i}}{{end}}
+    environment:
+      WATCHER_ADDRESSES: "{{range $i,$v := .}}{{if $i}},{{end}}http://watcher{{add 1 $i}}:{{add 1001 $i}}{{end}}"
+      PORT: 7807
+{{range $i,$v := .}}
+
+  watcher{{add 1 $i}}:
+    build: ./watcher-node
+    restart: on-failure
+    volumes:
+        - {{$v}}:/host/watched-folder
+    ports:
+      - {{add 1001 $i}}
+    environment:
+      FILE_AGGREGATOR_ADDRESS: "http://file_aggregator:7807"
+      PORT: {{add 1001 $i}}{{end}}
+
