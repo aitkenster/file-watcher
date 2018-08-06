@@ -1,10 +1,12 @@
-#File aggregator
+# File aggregator
 
 Stores and returns a list of file names.
 
 ## Endpoint
 
 ### Retrieve a list of files
+
+The files are not ordered in any particular way
 
 ```
 GET http://localhost:9999/files
