@@ -9,7 +9,7 @@ Watch and retrieve an aggregated, alphabetized list of files from the folders yo
 ### Retrieve a list of files
 
 ```
-GET http://localhost:9999/files
+GET http://localhost:7807/files
 ```
 
 Response body:
@@ -28,12 +28,11 @@ Response body:
 System requirements: Docker
 
 1. `git clone git@github.com:aitkenster/file-watcher.git`
-2. Run `make run` ( this will create a `file-watcher/example` directory with watched sub directories.
+2. Run `make build-and-run` ( this will create a `file-watcher/example` directory with watched sub directories.
+3. `make stop` to stop
 
 To use your own folders:
-Change the `.env` file to point to the folders you want to watch. Paths can be relative (from the file-watcher folder), or absolute.
-
-To add more folder watchers than the default 3, increase the number of `watcher` services in the `docker-compose.yml` file. Remember to update the port and `WATCHER_ADDRESSES` in the `file_aggregator` service.
+Change the `WATCHED_FOLDERS` env var in the `build-and-run` command in the Makefile to use your own folders as comma seperated values. Paths can be relative (from the file-watcher folder), or absolute. One watcher node will be generated per folder.
 
 ## Tests
 Run `make test` to run all tests
@@ -43,4 +42,3 @@ Run `make test` to run all tests
 - Check for changes within nested folders
 - Integration and API tests
 - Pagination in the API
-- Generate watcher services with a docker compose template
